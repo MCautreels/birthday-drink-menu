@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2b2140">
+  <title>Bar Admin</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧾</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .admin-top { background: var(--ink); color: #fff; padding: 16px 16px 12px; }
+    .admin-top h1 { font-family: var(--font-head); margin: 0; font-size: 24px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .conn { font-family: var(--font-body); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; opacity: .9; }
+    .conn i { width: 9px; height: 9px; border-radius: 50%; background: #aaa; }
+    .conn.open i { background: var(--mint); }
+    .conn.reconnecting i { background: var(--sun); }
+    .admin-top .row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .pill-btn { background: rgba(255,255,255,.14); color: #fff; padding: 8px 12px; border-radius: 999px; font-weight: 800; font-size: 13px; }
+    .pill-btn.on { background: var(--sun); color: var(--ink); }
+    .admin-tabs { top: 0; }
+    .admin-tabs .tab .n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; margin-left: 4px; border-radius: 999px; background: var(--primary); color: #fff; font-size: 12px; }
+    .admin-main { padding: 12px 16px 40px; max-width: 760px; margin: 0 auto; }
+    .order { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; margin-bottom: 12px; border-left: 6px solid var(--primary); }
+    .order.done { border-left-color: var(--mint); opacity: .75; }
+    .order.new { animation: pop .6s ease; }
+    @keyframes pop { 0% { transform: scale(.96); background: #fff3cd; } 100% { transform: none; } }
+    .order header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .order .oc { font-family: var(--font-head); font-size: 26px; font-weight: 700; }
+    .order .who { font-weight: 800; font-size: 17px; }
+    .order .when { color: var(--muted); font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .order ul { list-style: none; padding: 0; margin: 10px 0; }
+    .order li { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px dashed var(--line); font-weight: 700; }
+    .order li:first-child { border-top: 0; }
+    .order li img { width: 30px; height: 40px; object-fit: contain; }
+    .order li b { display: inline-grid; place-items: center; min-width: 30px; height: 30px; border-radius: 9px; background: var(--soft); font-size: 16px; }
+    .order .note { background: #fff3cd; border-radius: 10px; padding: 8px 10px; font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+    .order .btns { display: flex; gap: 8px; }
+    .done-btn { flex: 1; padding: 12px; border-radius: 12px; background: var(--mint); color: #fff; font-weight: 800; font-size: 16px; }
+    .undo-btn { flex: 1; padding: 10px; border-radius: 12px; background: var(--soft); font-weight: 800; }
+    .totals { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 6px 14px; }
+    .totals .t { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-weight: 700; }
+    .totals .t:first-child { border-top: 0; }
+    .totals .t img { width: 30px; height: 40px; object-fit: contain; }
+    .totals .t span { flex: 1; }
+    .totals .t b { font-family: var(--font-head); font-size: 20px; }
+    .totals h3 { font-family: var(--font-head); margin: 14px 0 0; font-size: 16px; color: var(--muted); }
+    .help { background: var(--card); border-radius: var(--radius); padding: 14px; margin-top: 16px; font-size: 14px; color: var(--muted); box-shadow: var(--shadow); }
+    .help code { background: var(--soft); padding: 2px 6px; border-radius: 6px; color: var(--ink); word-break: break-all; }
+    .help a { color: var(--accent); font-weight: 800; }
+  </style>
+</head>
+<body>
+  <header class="admin-top">
+    <h1>🧾 Bar · Mila &amp; Vik <span class="conn" id="conn"><i></i><span>Verbinden…</span></span></h1>
+    <div class="row">
+      <button class="pill-btn" id="soundBtn">🔕 Geluid uit</button>
+      <a class="pill-btn" href="index.html" target="_blank" style="text-decoration:none">📱 Menu openen</a>
+    </div>
+  </header>
+  <nav class="tabs admin-tabs" id="tabs">
+    <button class="tab active" data-view="open">Open <span class="n" id="nOpen">0</span></button>
+    <button class="tab" data-view="done">Klaar <span id="nDone"></span></button>
+    <button class="tab" data-view="totals">📊 Overzicht</button>
+  </nav>
+  <main class="admin-main" id="list"></main>
+
+  <script src="js/config.js"></script>
+  <script src="js/ntfy.js"></script>
+  <script src="js/drinks.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
