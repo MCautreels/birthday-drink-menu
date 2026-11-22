@@ -40,6 +40,11 @@
     .order .btns { display: flex; gap: 8px; }
     .done-btn { flex: 1; padding: 12px; border-radius: 12px; background: var(--mint); color: #fff; font-weight: 800; font-size: 16px; }
     .undo-btn { flex: 1; padding: 10px; border-radius: 12px; background: var(--soft); font-weight: 800; }
+    .cancel-btn { flex: 0 0 auto; padding: 10px 12px; border-radius: 12px; background: #fde8ea; color: #c62828; font-weight: 800; font-size: 14px; }
+    .order.cancelled { border-left-color: #bbb; opacity: .6; }
+    .order.cancelled ul { text-decoration: line-through; }
+    .cancelled-tag { color: #c62828; font-weight: 800; font-size: 14px; margin-bottom: 10px; }
+    .section-h { font-family: var(--font-head); color: var(--muted); font-size: 18px; margin: 22px 0 10px; }
     .totals { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 6px 14px; }
     .totals .t { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-weight: 700; }
     .totals .t:first-child { border-top: 0; }

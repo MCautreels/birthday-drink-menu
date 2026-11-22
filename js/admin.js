@@ -24,7 +24,9 @@
         if (m.t === 'order') orders[m.id] = { ...m, status: 'open' };
         if (m.t === 'status') statuses[m.id] = m.s;
       });
-    Object.entries(statuses).forEach(([id, s]) => { if (orders[id]) orders[id].status = s === 'done' ? 'done' : 'open'; });
+    Object.entries(statuses).forEach(([id, s]) => {
+      if (orders[id]) orders[id].status = s === 'done' || s === 'cancelled' ? s : 'open';
+    });
     return Object.values(orders);
   }
 
@@ -36,23 +38,30 @@
   }
 
   function orderHtml(o) {
-    return `<article class="order ${o.status === 'done' ? 'done' : ''} ${freshIds.has(o.id) ? 'new' : ''}">
+    const id = esc(o.id);
+    const cancelBtn = `<button class="cancel-btn" data-cancel="${id}" aria-label="Annuleren">✕ Annuleren</button>`;
+    const btns = o.status === 'cancelled'
+      ? `<button class="undo-btn" data-undo="${id}">↩︎ Herstellen</button>`
+      : o.status === 'done'
+        ? `<button class="undo-btn" data-undo="${id}">↩︎ Terug naar open</button>${cancelBtn}`
+        : `<button class="done-btn" data-done="${id}">✓ Klaar</button>${cancelBtn}`;
+    return `<article class="order ${o.status} ${freshIds.has(o.id) ? 'new' : ''}">
       <header><div><span class="oc">#${esc(o.id)}</span> <span class="who">${esc(o.name)}</span></div><span class="when">${ago(o.ts || o._time * 1000)}</span></header>
       <ul>${(o.items || []).map((i) => {
         const d = byId[i.id];
         return `<li><b>${Number(i.qty) || 0}</b>${d ? `<img src="${d.src}" alt="">` : ''}<span>${esc(i.name)}</span></li>`;
       }).join('')}</ul>
       ${o.note ? `<div class="note">💬 ${esc(o.note)}</div>` : ''}
-      <div class="btns">${o.status === 'done'
-        ? `<button class="undo-btn" data-undo="${esc(o.id)}">↩︎ Terug naar open</button>`
-        : `<button class="done-btn" data-done="${esc(o.id)}">✓ Klaar</button>`}</div>
+      ${o.status === 'cancelled' ? `<div class="cancelled-tag">❌ Geannuleerd</div>` : ''}
+      <div class="btns">${btns}</div>
     </article>`;
   }
 
   function render() {
     const orders = buildState();
-    const open = orders.filter((o) => o.status !== 'done').sort((a, b) => a.ts - b.ts); // oudste eerst
+    const open = orders.filter((o) => o.status === 'open').sort((a, b) => a.ts - b.ts); // oudste eerst
     const done = orders.filter((o) => o.status === 'done').sort((a, b) => b.ts - a.ts);
+    const cancelled = orders.filter((o) => o.status === 'cancelled').sort((a, b) => b.ts - a.ts);
     $('#nOpen').textContent = open.length;
     $('#nDone').textContent = done.length ? `(${done.length})` : '';
     document.title = (open.length ? `(${open.length}) ` : '') + 'Bar Admin';
@@ -62,8 +71,9 @@
       html = open.length ? open.map(orderHtml).join('') : `<p class="empty">Geen open bestellingen 🎉<br>Nieuwe bestellingen verschijnen hier vanzelf.</p>`;
     } else if (view === 'done') {
       html = done.length ? done.map(orderHtml).join('') : `<p class="empty">Nog niets afgewerkt.</p>`;
+      if (cancelled.length) html += `<h3 class="section-h">❌ Geannuleerd (${cancelled.length})</h3>` + cancelled.map(orderHtml).join('');
     } else {
-      html = totalsHtml(orders);
+      html = totalsHtml(orders.filter((o) => o.status !== 'cancelled'));
     }
     html += helpHtml();
     $('#list').innerHTML = html;
@@ -93,9 +103,10 @@
   async function setStatus(id, s, btn) {
     btn.disabled = true;
     const o = buildState().find((x) => x.id === id);
+    const label = { done: ['✅', 'klaar'], cancelled: ['❌', 'geannuleerd'], open: ['↩️', 'terug open'] }[s];
     try {
       const res = await Ntfy.publish({
-        title: `${s === 'done' ? '✅' : '↩️'} #${id} ${s === 'done' ? 'klaar' : 'terug open'}`,
+        title: `${label[0]} #${id} ${label[1]}`,
         message: o ? `Bestelling van ${o.name}` : `Bestelling #${id}`,
         tags: ['status'],
         priority: 1,
@@ -116,6 +127,11 @@
     const u = e.target.closest('[data-undo]');
     if (d) setStatus(d.dataset.done, 'done', d);
     if (u) setStatus(u.dataset.undo, 'open', u);
+    const c = e.target.closest('[data-cancel]');
+    if (c) {
+      const o = buildState().find((x) => x.id === c.dataset.cancel);
+      if (confirm(`Bestelling #${c.dataset.cancel}${o ? ' van ' + o.name : ''} annuleren?`)) setStatus(c.dataset.cancel, 'cancelled', c);
+    }
   });
 
   $('#tabs').addEventListener('click', (e) => {

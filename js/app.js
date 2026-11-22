@@ -210,9 +210,9 @@
   }
 
   function statusHtml(o) {
-    return o.status === 'done'
-      ? `<span class="status ready">✅ Klaar!</span>`
-      : `<span class="status">⏳ Wordt klaargemaakt</span>`;
+    if (o.status === 'done') return `<span class="status ready">✅ Klaar!</span>`;
+    if (o.status === 'cancelled') return `<span class="status cancelled">❌ Geannuleerd</span>`;
+    return `<span class="status">⏳ Wordt klaargemaakt</span>`;
   }
 
   function showConfirmation(order) {
@@ -239,7 +239,7 @@
   function renderMyOrdersBtn() {
     const btn = $('#myOrdersBtn');
     if (!myOrders.length) { btn.hidden = true; return; }
-    const open = myOrders.filter((o) => o.status !== 'done').length;
+    const open = myOrders.filter((o) => o.status === 'open').length;
     btn.hidden = false;
     btn.innerHTML = open
       ? `<span class="dot"></span>Mijn bestellingen (${open} bezig)`
@@ -249,6 +249,7 @@
   // ---------- Live status of my orders ----------
   let unsub = null;
   function watchStatus() {
+    // Ook geannuleerde bestellingen blijven we volgen: de bar kan ze nog herstellen.
     const open = myOrders.filter((o) => o.status !== 'done');
     if (!open.length || document.hidden) { if (unsub) { unsub(); unsub = null; } return; }
     if (unsub) return;
@@ -260,7 +261,7 @@
       if (latest[d.id] && latest[d.id] > d._time) return;
       latest[d.id] = d._time;
       const before = o.status;
-      o.status = d.s === 'done' ? 'done' : 'open';
+      o.status = d.s === 'done' || d.s === 'cancelled' ? d.s : 'open';
       store.set('myOrders', myOrders);
       renderMyOrdersBtn();
       if (sheetMode === 'mine') renderMineSheet();
@@ -270,6 +271,7 @@
         toast(`✅ Bestelling #${o.id} is klaar!`);
         if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
       }
+      if (before !== 'cancelled' && o.status === 'cancelled') toast(`❌ Bestelling #${o.id} is geannuleerd`);
       if (!myOrders.some((x) => x.status !== 'done') && unsub) { unsub(); unsub = null; }
     });
   }

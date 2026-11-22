@@ -212,6 +212,7 @@ label.field span { color: var(--muted); font-weight: 600; }
   font-weight: 800; font-size: 14px; background: #fff3cd; color: #8a6100;
 }
 .status.ready { background: #d6f5ea; color: #126b52; }
+.status.cancelled { background: #fde8ea; color: #c62828; }
 .mine { background: var(--card); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
 .mine header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
 .mine .code-sm { font-family: var(--font-head); font-weight: 700; font-size: 20px; }
