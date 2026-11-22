@@ -91,6 +91,23 @@
         <circle cx="68" cy="150" r="10" fill="${o.fruit2 || o.fruit || '#ffb26b'}" opacity=".95"/>
         <path d="M54 125v26M41 138h26M45 129l18 18M63 129l-18 18" stroke="#fff" stroke-width=".8" opacity=".6"/>
         <rect x="40" y="30" width="4" height="146" rx="2" fill="#fff" opacity=".3"/>`;
+    } else if (kind === 'cup') {
+      // Warme drank: kopje op een schoteltje met stoom.
+      body = `
+        <g fill="none" stroke="#c9b8a6" stroke-width="3" stroke-linecap="round" opacity=".8">
+          <path d="M46 74c-6-8 6-14 0-22s6-14 0-22"/>
+          <path d="M60 70c-6-8 6-14 0-22s6-14 0-22"/>
+          <path d="M74 74c-6-8 6-14 0-22s6-14 0-22"/>
+        </g>
+        <ellipse cx="60" cy="166" rx="50" ry="10" fill="#e8ddd0"/>
+        <ellipse cx="60" cy="163" rx="40" ry="7" fill="#f6efe6"/>
+        <path d="M92 104c18 0 20 32 0 36" fill="none" stroke="${o.cup || '#ffffff'}" stroke-width="8" stroke-linecap="round"/>
+        <path d="M24 94h72v36c0 18-14 32-32 32h-8c-18 0-32-14-32-32z" fill="${o.cup || '#ffffff'}" stroke="#e2d6c8" stroke-width="2"/>
+        <ellipse cx="60" cy="94" rx="36" ry="7" fill="${liquid}"/>
+        ${o.foam ? `<ellipse cx="58" cy="94" rx="22" ry="4" fill="${o.foam}" opacity=".9"/>` : ''}
+        ${o.tag ? `<path d="M74 92c8 4 10 14 10 24" fill="none" stroke="#b9a58a" stroke-width="1"/><rect x="78" y="114" width="13" height="15" rx="2" fill="${o.tag}"/>` : ''}
+        <text x="58" y="136" font-family="Georgia,serif" font-size="${fit(0, 12, 54, 0.62)}" text-anchor="middle" fill="${ink}" font-weight="700">${t[0] || ''}</text>
+        <rect x="30" y="102" width="5" height="34" rx="2.5" fill="#fff" opacity=".5"/>`;
     }
     const svg =`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 190">${body}</svg>`;
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
@@ -102,6 +119,7 @@
     { id: 'mocktails', name: 'Mocktails', emoji: '🍹', note: 'Sir. James 101: alcoholvrije cocktails' },
     { id: 'fris', name: 'Frisdrank', emoji: '🥤' },
     { id: 'water', name: 'Water', emoji: '💧' },
+    { id: 'warm', name: 'Warme dranken', emoji: '☕', note: 'Melk of suiker? Zet het in je opmerking.' },
   ];
 
   const DRINKS = [
@@ -143,6 +161,10 @@
     // Water
     { id: 'plat-water', cat: 'water', name: 'Plat water', sub: 'Zonder bubbels', art: art('pet', { liquid: '#cfe9fb', opacity: .9, label: '#1565c0', ink: '#fff', cap: '#1565c0', stripe: '#90caf9', text: 'PLAT|WATER', size: 13 }) },
     { id: 'bruiswater', cat: 'water', name: 'Bruiswater', sub: 'Met bubbels', art: art('pet', { liquid: '#cfe9fb', opacity: .9, label: '#d62828', ink: '#fff', cap: '#d62828', stripe: '#ffb4a2', text: 'BRUIS|WATER', size: 13, bubbles: true }) },
+
+    // Warme dranken
+    { id: 'koffie', cat: 'warm', name: 'Koffie', sub: 'Vers gezet', art: art('cup', { liquid: '#5b3a1e', foam: '#a8784f', cup: '#ffffff', ink: '#5b3a1e', text: 'KOFFIE' }) },
+    { id: 'thee', cat: 'warm', name: 'Thee', sub: 'Kopje thee', art: art('cup', { liquid: '#c47a2c', tag: '#ffc93c', cup: '#fff4f6', ink: '#b04a5a', text: 'THEE' }) },
   ];
 
   DRINKS.forEach((d) => (d.src = d.img || d.art));
