@@ -1,7 +1,7 @@
 # 🎈 Drankkaart Mila (8) & Vik (4)
 
 Online drankkaart voor het verjaardagsfeest, geoptimaliseerd voor de telefoon.
-Gasten bekijken de drankjes per categorie (met foto), stellen een bestelling samen
+Gasten bekijken de drankjes per categorie (met getekende flesjes), stellen een bestelling samen
 en zien live wanneer hun bestelling klaar is. De bar volgt alles op in het admin-gedeelte.
 
 - **Menu:** `index.html`
@@ -20,9 +20,9 @@ Bestellingen worden als bericht verstuurd naar een [ntfy.sh](https://ntfy.sh) to
 
 ## Drankjes aanpassen
 
-Alles staat in [`js/drinks.js`](js/drinks.js). Een foto toevoegen of vervangen:
-zet het bestand in `images/` en vul `img: 'images/naam.jpg'` in bij het drankje.
-Drankjes zonder `img` krijgen een getekend flesje.
+Alles staat in [`js/drinks.js`](js/drinks.js). Elk drankje heeft een getekend flesje
+(`art: art('wine' | 'sparkling' | 'beer' | 'can' | 'slimcan' | 'pet' | 'mocktail', {...})`) met eigen kleuren en etikettekst.
+Liever toch een foto? Zet het bestand in `images/` en vul `img: 'images/naam.jpg'` in bij het drankje.
 
 ## Lokaal draaien
 
@@ -32,6 +32,3 @@ python3 -m http.server 8765
 
 Open daarna http://localhost:8765.
 
-## Credits
-
-Productfoto's van [Open Food Facts](https://world.openfoodfacts.org), licentie CC BY-SA.
