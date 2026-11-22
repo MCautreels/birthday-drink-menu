@@ -6,6 +6,9 @@
 window.CONFIG = {
   ntfyServer: 'https://ntfy.sh',
   topic: 'mila8-vik4-drankjes-9351bbf3',
+  // Zet op true om bestellen weer aan te zetten.
+  ordersOpen: false,
+  closedMessage: 'Sorry, het feestje is afgelopen. Tot volgend jaar!',
 };
 
 // Om te testen zonder de echte bestellingen te vervuilen: voeg ?topic=iets-anders toe aan de URL.

@@ -80,9 +80,26 @@
     updateCart();
   }
 
+  // ---------- Bestellen gesloten ----------
+  const ordersOpen = CONFIG.ordersOpen !== false;
+  if (!ordersOpen) {
+    cart = {};
+    document.body.classList.add('orders-closed');
+  }
+  function showClosed() {
+    openSheet('closed');
+    $('#sheetBody').innerHTML = `<div class="done">
+      <div class="big">🎈</div>
+      <h2>${esc(CONFIG.closedMessage || 'Bestellen is gesloten.')}</h2>
+      <button class="primary-btn" id="closedOk">Oké!</button>
+    </div>`;
+    $('#closedOk').addEventListener('click', closeSheet);
+  }
+
   document.addEventListener('click', (e) => {
     const inc = e.target.closest('[data-inc]');
     const dec = e.target.closest('[data-dec]');
+    if (!ordersOpen && (inc || dec)) { showClosed(); return; }
     if (inc) change(inc.dataset.inc, 1);
     if (dec) change(dec.dataset.dec, -1);
   });
@@ -171,6 +188,7 @@
   }
 
   async function placeOrder() {
+    if (!ordersOpen) { showClosed(); return; }
     const name = $('#orderName').value.trim();
     const note = $('#orderNote').value.trim();
     const err = $('#orderError');

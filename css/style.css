@@ -126,6 +126,7 @@ main { padding: 4px 16px 120px; max-width: 760px; margin: 0 auto; }
   background: var(--soft); font-weight: 800; font-size: 14px; color: var(--ink);
 }
 .add-btn:active { transform: scale(.97); }
+.orders-closed .add-btn { color: var(--muted); opacity: .6; }
 .stepper {
   display: flex; align-items: center; justify-content: space-between;
   background: var(--primary); color: #fff; border-radius: 12px; padding: 3px;
